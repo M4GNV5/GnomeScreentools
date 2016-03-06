@@ -36,14 +36,13 @@ app.post("/upload/:secret", function(req, res)
 	req.pipe(req.busboy);
 	req.busboy.on("file", function (name, file, filename)
 	{
-		console.log("Uploading: " + filename);
 		var outname = Math.random().toString(36).substr(2, 6) + filename.substr(filename.lastIndexOf("."));
+		console.log((new Date()).toLocaleString() + " Uploading: " + outname);
 		var stream = fs.createWriteStream(__dirname + "/../files/" + outname);
 		file.pipe(stream);
 		stream.on("close", function ()
 		{
-			console.log("done upload");
-			res.end(req.get("host") + "/i/" + outname);
+			res.end("http://" + req.get("host") + "/i/" + outname);
 		});
 	});
 });
