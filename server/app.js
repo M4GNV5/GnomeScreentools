@@ -42,12 +42,12 @@ app.post("/upload/:secret", function(req, res)
 		file.pipe(stream);
 		stream.on("close", function ()
 		{
-			res.end("http://" + req.get("host") + "/i/" + outname);
+			res.end("http://" + req.get("host") + "/" + outname);
 		});
 	});
 });
 
-app.use("/i", express.static(__dirname + "/../files"));
+app.use("/", express.static(__dirname + "/../files"));
 
 app.listen(config.port, function()
 {
