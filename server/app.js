@@ -11,6 +11,11 @@ app.get("/", function(req, res)
 	res.sendFile(__dirname + "/index.html");
 });
 
+app.get("/:file", function(req, res)
+{
+	res.sendFile(__dirname + "/view.html");
+});
+
 app.get("/list", function(req, res)
 {
 	fs.readdir(__dirname + "/../files", function(err, files)
@@ -47,7 +52,7 @@ app.post("/upload/:secret", function(req, res)
 	});
 });
 
-app.use("/", express.static(__dirname + "/../files"));
+app.use("/files", express.static(__dirname + "/../files"));
 
 app.listen(config.port, function()
 {

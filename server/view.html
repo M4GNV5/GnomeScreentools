@@ -1,0 +1,88 @@
+<html>
+	<head>
+		<style>
+			#content
+			{
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				-webkit-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+			}
+			#footer
+			{
+			    bottom: 2px;
+			    right: 5px;
+			    position: absolute;
+				color: white;
+			}
+			a
+			{
+				text-decoration: none;
+				color: inherit;
+			}
+		</style>
+	</head>
+	<body background="files/background.jpg">
+		<div id="content"></div>
+		<div id="footer"><a href="https://github.com/M4GNV5">Github</a> - <a href="https://twitter.com/M46NV5">Twitter</a></div>
+		<script type="text/javascript">
+			var content = document.getElementById("content");
+		
+			var display = {
+				"png": "<img src=\"%url\" />",
+				"mp4": "<video src=\"%url\" controls autoplay></video>",
+				"txt": function(url)
+				{
+					var otherDone = false;
+					function finish()
+					{
+						content.style = "width: 600px; height: 400px;";
+						var editor = ace.edit("content");
+						editor.setTheme("ace/theme/tomorrow_night");
+						editor.getSession().setMode("ace/mode/csharp");
+						editor.getSession().setUseWorker(false);
+						editor.setOptions({
+							readOnly: true,
+							highlightActiveLine: false,
+							highlightGutterLine: false
+						});
+					}
+					
+					var acefile = document.createElement("script");
+					acefile.src = "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ace.js";
+					acefile.onload = function()
+					{
+						if(otherDone)
+							finish();
+						else
+							otherDone = true;
+					};
+					document.getElementsByTagName("head")[0].appendChild(acefile);
+					
+					var req = new XMLHttpRequest();
+					req.addEventListener("load", function()
+					{
+						content.innerHTML = this.responseText;
+						
+						if(otherDone)
+							finish();
+						else
+							otherDone = true;
+					});
+					req.open("GET", url);
+					req.send();
+				}
+			};
+			
+			var file = window.location.pathname;
+			var fileUrl = document.URL.replace(file, "/files" + file);
+			var ending = file.substr(file.lastIndexOf(".") + 1);
+			
+			if(typeof display[ending] == "function")
+				display[ending](fileUrl);
+			else
+				content.innerHTML = display[ending].toString().replace(/%url/g, fileUrl);
+		</script>
+	</body>
+</html>
