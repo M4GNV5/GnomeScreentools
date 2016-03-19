@@ -11,6 +11,7 @@ config.file = config["tmpfile"] || "screencapture";
 var modes = {
 	"img-full": shellCmd("gnome-screenshot -f {file}", "png"),
 	"img-region": shellCmd("gnome-screenshot -a -f {file}", "png"),
+	"clipboard": shellCmd("xclip -selection clipboard -o > {file}", "txt"),
 	"vid-full": function()
 	{
 		config.file += ".mp4";
@@ -80,6 +81,7 @@ function afterRecord(err)
 			if(err)
 				throw err;
 			console.log(url);
+			notify(url, 1000);
 			process.exit(0);
 		});
 	});
@@ -92,6 +94,16 @@ function upload(file, cb)
 	});
 	var form = req.form();
 	form.append("file", fs.createReadStream(file));
+}
+
+function notify(text, timeout, icon, cb)
+{
+	timeout = timeout || 3000;
+	icon = icon || "camera-web";
+	var p = exec("notify-send -t " + timeout + " -i " + icon + " \"" + text + "\"");
+	
+	if(cb)
+		setTimeout(cb, timeout);
 }
 
 function copypasta(text, cb)
