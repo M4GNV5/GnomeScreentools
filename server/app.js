@@ -6,16 +6,6 @@ var config = require("./config.json");
 var app = express();
 app.use(busboy());
 
-app.get("/", function(req, res)
-{
-	res.sendFile(__dirname + "/index.html");
-});
-
-app.get("/:file", function(req, res)
-{
-	res.sendFile(__dirname + "/view.html");
-});
-
 app.get("/list", function(req, res)
 {
 	fs.readdir(__dirname + "/../files", function(err, files)
@@ -53,6 +43,10 @@ app.post("/upload/:secret", function(req, res)
 });
 
 app.use("/files", express.static(__dirname + "/../files"));
+app.get("/:file", function(req, res)
+{
+	res.sendFile(__dirname + "/view.html");
+});
 
 app.listen(config.port, function()
 {
