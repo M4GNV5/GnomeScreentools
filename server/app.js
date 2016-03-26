@@ -9,7 +9,8 @@ app.use(busboy());
 
 app.get("/list", function(req, res)
 {
-	fs.readdir(__dirname + "/../files", function(err, files)
+	var basePath = __dirname + "/../files/";
+	fs.readdir(basePath, function(err, files)
 	{
 		if(err)
 		{
@@ -17,6 +18,15 @@ app.get("/list", function(req, res)
 			res.end("[]");
 			return;
 		}
+		
+		var cache = {};
+		files.sort(function(a, b)
+		{
+			cache[a] = cache[a] || fs.statSync(basePath + a).mtime.getTime();
+			cache[b] = cache[b] || fs.statSync(basePath + b).mtime.getTime();
+			return cache[a] - cache[b];
+		});
+		
 		res.send(JSON.stringify(files));
 	});
 });
