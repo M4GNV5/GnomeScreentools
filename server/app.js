@@ -1,4 +1,5 @@
 var fs = require("fs");
+var WebSocketServer = require("ws").Server;
 var express = require("express");
 var busboy = require("connect-busboy");
 var config = require("./config.json");
@@ -39,6 +40,48 @@ app.post("/upload/:secret", function(req, res)
 		{
 			res.end("http://" + req.get("host") + "/" + outname);
 		});
+	});
+});
+
+var streamWidth = 960;
+var streamHeight = 540; 
+var wss = new WebSocketServer({port: config.wsPort});
+wss.on("connection", function(socket)
+{
+	var streamHeader = new Buffer(8);
+	streamHeader.write("jsmp");
+	streamHeader.writeUInt16BE(streamWidth, 4);
+	streamHeader.writeUInt16BE(streamHeight, 6);
+	socket.send(streamHeader, {binary:true});
+});
+wss.broadcast = function(data, opts)
+{
+	this.clients.forEach(function(socket)
+	{
+		if(socket.readyState == 1)
+			socket.send(data, opts);
+	});
+};
+
+app.get("/jsmpeg.js", function(req, res)
+{
+	res.sendFile(__dirname + "/jsmpeg.js");
+});
+app.post("/stream/:width/:height/:secret", function(req, res)
+{
+	if(req.params.secret != config.secret)
+	{
+		res.end("invalid secret");
+		return;
+	}
+	console.log("Stream connected");
+	
+	streamWidth = req.params.width;
+	streamHeight = req.params.height;
+	
+	req.on("data", function(buff)
+	{
+		wss.broadcast(buff, {binary:true});
 	});
 });
 

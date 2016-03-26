@@ -26,6 +26,28 @@ var modes = {
 		{
 			p.kill("SIGINT");
 		});
+	},
+	"stream": function()
+	{
+		args = formatCmd("-video_size {screen-size} -f x11grab -i :0.0 -vf scale={vid-scale} " +
+			"-f mpeg1video -r {stream-fps} {stream-url}");
+			
+		copypasta(config["stream-public-url"], function()
+		{
+			notify("Starting to stream...", 1000);
+			var p = childp.spawn("avconv", args.split(" "));
+			p.on("close", function()
+			{
+				notify("Stream stopped.", 3000, false, function()
+				{
+					process.exit(0);
+				});
+			});
+			server.once("connection", function()
+			{
+				p.kill("SIGINT");
+			});
+		});
 	}
 };
 

@@ -1,4 +1,5 @@
 {
 	"port": 8080,
+	"wsPort": 8091,
 	"secret": "hunter2"
 }

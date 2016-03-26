@@ -63,6 +63,16 @@
 					req.addEventListener("load", finish);
 					req.open("GET", url);
 					req.send();
+				},
+				"/stream": function()
+				{
+					loadScript("jsmpeg.js", function()
+					{
+						var client = new WebSocket("ws://" + document.domain + ":8091/");
+						var canvas = document.createElement("canvas");
+						content.appendChild(canvas);
+						var player = new jsmpeg(client, {canvas:canvas});
+					});
 				}
 			};
 			
