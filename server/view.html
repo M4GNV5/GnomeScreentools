@@ -16,7 +16,7 @@
 			    position: absolute;
 				color: white;
 			}
-			a
+			#footer a
 			{
 				text-decoration: none;
 				color: inherit;
@@ -25,6 +25,10 @@
 			{
 				margin-top: 0px;
 				margin-bottom: 0px;
+			}
+			a, a:visited
+			{
+				color: #0000EE;
 			}
 		</style>
 	</head>
@@ -73,6 +77,34 @@
 						content.appendChild(canvas);
 						var player = new jsmpeg(client, {canvas:canvas});
 					});
+				},
+				"/": function()
+				{
+					var req = new XMLHttpRequest();
+					req.addEventListener("load", function()
+					{
+						var files = JSON.parse(this.responseText);
+						var sorted = {misc: [], png: [], mp4: [], txt: []};
+						var knownExtensions = ["png", "mp4", "txt"];
+						files.forEach(function(file)
+						{
+							var ext = file.substr(file.lastIndexOf(".") + 1);
+							var src = "<a href=\"/" + file + "\">" + file + "</a>";
+							
+							if(knownExtensions.indexOf(ext) == -1)
+								sorted.misc.push(src);
+							else
+								sorted[ext].push(src);
+						});
+						
+						content.style = "background-color: #EEEEEE; padding: 10px; max-width: 600px;";
+						content.innerHTML = "<b>Images:</b> " + sorted.png.join(", ") + 
+							"<br /><b>Videos:</b> " + sorted.mp4.join(", ") +
+							"<br /><b>Text:</b> " + sorted.txt.join(", ") +
+							"<br /><b>Misc:</b> " + sorted.misc.join(", ");
+					});
+					req.open("GET", "/list");
+					req.send();
 				}
 			};
 			

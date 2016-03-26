@@ -91,6 +91,11 @@ app.get("/:file", function(req, res)
 	res.sendFile(__dirname + "/view.html");
 });
 
+app.get("/", function(req, res)
+{
+	res.sendFile(__dirname + "/view.html");
+});
+
 app.listen(config.port, function()
 {
 	console.log("Started webserver on port " + config.port);
