@@ -47,9 +47,7 @@ var modes = {
 
 			var pos = ":0.0+" + x + "," + y;
 			var size = width + "x" + height;
-
 			args = formatCmd("-video_size " + size + " -framerate {vid-fps} -f x11grab -i " + pos + " {file}");
-			console.log("avconv " + args);
 
 			var p = childp.spawn("avconv", args.split(" "));
 			p.on("close", function()
