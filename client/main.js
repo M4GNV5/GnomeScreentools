@@ -27,11 +27,46 @@ var modes = {
 			p.kill("SIGINT");
 		});
 	},
+	"vid-window": function()
+	{
+		config.file += ".mp4";
+
+		exec("xwininfo", function(err, stdout, stderr)
+		{
+			var x = stdout.match(/Absolute upper-left X:\s*(\d+)/)[1];
+			var y = stdout.match(/Absolute upper-left Y:\s*(\d+)/)[1];
+			var width = stdout.match(/Width:\s*(\d+)/)[1];
+			var height = stdout.match(/Height:\s*(\d+)/)[1];
+
+			width = parseInt(width);
+			height = parseInt(height);
+			if(width % 2 != 0) //make libx264 happy
+				width++;
+			if(height % 2 != 0)
+				height++;
+
+			var pos = ":0.0+" + x + "," + y;
+			var size = width + "x" + height;
+
+			args = formatCmd("-video_size " + size + " -framerate {vid-fps} -f x11grab -i " + pos + " {file}");
+			console.log("avconv " + args);
+
+			var p = childp.spawn("avconv", args.split(" "));
+			p.on("close", function()
+			{
+				afterRecord();
+			});
+			server.once("connection", function()
+			{
+				p.kill("SIGINT");
+			});
+		});
+	},
 	"stream": function()
 	{
 		args = formatCmd("-video_size {screen-size} -f x11grab -i :0.0 -vf scale={vid-scale} " +
 			"-f mpeg1video -r {stream-fps} {stream-url}");
-			
+
 		copypasta(config["stream-public-url"], function()
 		{
 			notify("Starting to stream...", 1000);
@@ -123,7 +158,7 @@ function notify(text, timeout, icon, cb)
 	timeout = timeout || 3000;
 	icon = icon || "camera-web";
 	var p = exec("notify-send -t " + timeout + " -i " + icon + " \"" + text + "\"");
-	
+
 	if(cb)
 		setTimeout(cb, timeout);
 }
