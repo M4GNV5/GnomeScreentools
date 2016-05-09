@@ -64,8 +64,7 @@
 						if(done != 3)
 							return;
 						console.log(JSON.stringify(text));
-
-						content.style = "width: 600px; height: 400px;";
+						content.style = "max-height: 90%; max-width: 90%; overflow-y: overlay;";
 						content.innerHTML = "<pre><code>" + text + "</code></pre>";
 						hljs.highlightBlock(content);
 					}
