@@ -1,14 +1,24 @@
 <html>
 	<head>
 		<style>
-			#content
+			.center
 			{
-				position: fixed;
+				position: absolute;
 				top: 50%;
 				left: 50%;
-				-webkit-transform: translate(-50%, -50%);
 				transform: translate(-50%, -50%);
 			}
+			.list
+			{
+				background-color: #EEEEEE;
+				padding: 10px;
+				max-width: 600px;
+
+				position: absolute;
+				left: 50%;
+				transform: translate(-50%);
+			}
+
 			#footer
 			{
 			    bottom: 2px;
@@ -33,11 +43,11 @@
 		</style>
 	</head>
 	<body background="files/background.png">
-		<div id="content"></div>
+		<div id="content" class="center"></div>
 		<div id="footer"><a href="https://github.com/M4GNV5">Github</a> - <a href="https://twitter.com/M46NV5">Twitter</a></div>
 		<script type="text/javascript">
 			var content = document.getElementById("content");
-		
+
 			var display = {
 				"png": "<img src=\"%url\" />",
 				"mp4": "<video src=\"%url\" controls autoplay></video>",
@@ -49,20 +59,20 @@
 					{
 						if(this && this.responseText)
 							text = this.responseText;
-						
+
 						done++;
 						if(done != 3)
 							return;
 						console.log(JSON.stringify(text));
-							
+
 						content.style = "width: 600px; height: 400px;";
 						content.innerHTML = "<pre><code>" + text + "</code></pre>";
 						hljs.highlightBlock(content);
 					}
-					
+
 					loadStyle("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/railscasts.min.css", finish);
 					loadScript("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js", finish);
-					
+
 					var req = new XMLHttpRequest();
 					req.addEventListener("load", finish);
 					req.open("GET", url);
@@ -90,15 +100,15 @@
 						{
 							var ext = file.substr(file.lastIndexOf(".") + 1);
 							var src = "<a href=\"/" + file + "\">" + file + "</a>";
-							
+
 							if(knownExtensions.indexOf(ext) == -1)
 								sorted.misc.push(src);
 							else
 								sorted[ext].push(src);
 						});
-						
-						content.style = "background-color: #EEEEEE; padding: 10px; max-width: 600px;";
-						content.innerHTML = "<b>Images:</b> " + sorted.png.join(", ") + 
+
+						content.className = "list";
+						content.innerHTML = "<b>Images:</b> " + sorted.png.join(", ") +
 							"<br /><b>Videos:</b> " + sorted.mp4.join(", ") +
 							"<br /><b>Text:</b> " + sorted.txt.join(", ") +
 							"<br /><b>Misc:</b> " + sorted.misc.join(", ");
@@ -107,7 +117,7 @@
 					req.send();
 				}
 			};
-			
+
 			function loadStyle(url, cb)
 			{
 				var file = document.createElement("link");
@@ -123,11 +133,11 @@
 				file.onload = cb;
 				document.getElementsByTagName("head")[0].appendChild(file);
 			}
-			
+
 			var file = window.location.pathname;
 			var fileUrl = document.URL.replace(file, "/files" + file);
 			var ending = file.substr(file.lastIndexOf(".") + 1);
-			
+
 			if(typeof display[ending] == "function")
 				display[ending](fileUrl);
 			else
