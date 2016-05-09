@@ -12,6 +12,11 @@ var modes = {
 	"img-full": shellCmd("gnome-screenshot -f {file}", "png"),
 	"img-region": shellCmd("gnome-screenshot -a -f {file}", "png"),
 	"clipboard": shellCmd("xclip -selection clipboard -o > {file}", "txt"),
+	"cli": function()
+	{
+		config.file = process.argv[3];
+		afterRecord();
+	},
 	"vid-full": function()
 	{
 		config.file += ".mp4";
