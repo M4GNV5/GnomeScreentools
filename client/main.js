@@ -14,8 +14,16 @@ var modes = {
 	"clipboard": shellCmd("xclip -selection clipboard -o > {file}", "txt"),
 	"cli": function()
 	{
-		config.file = process.argv[3];
-		afterRecord();
+		var file = process.argv[3];
+		var tmp = "/tmp/screeenToolsCli" + file.substr(file.lastIndexOf("."));
+		exec("cp " + file + " " + tmp, function(err)
+		{
+			if(err)
+				throw err;
+
+			config.file = tmp;
+			afterRecord();
+		});
 	},
 	"vid-full": function()
 	{
