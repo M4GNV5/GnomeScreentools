@@ -19,6 +19,13 @@
 				transform: translate(-50%);
 			}
 
+			#unknown
+			{
+				background-color: #EEEEEE;
+				padding: 10px;
+				text-align: center;
+			}
+
 			#footer
 			{
 			    bottom: 2px;
@@ -52,6 +59,7 @@
 				"png": "<img src=\"%url\" />",
 				"jpg": "<img src=\"%url\" />",
 				"mp4": "<video src=\"%url\" controls autoplay></video>",
+				"unknown": "<div id=\"unknown\">Cannot display %file<br /><a href=\"%url\">Download file</a></div>",
 				"txt": function(url)
 				{
 					var done = 0;
@@ -127,14 +135,15 @@
 				document.getElementsByTagName("head")[0].appendChild(file);
 			}
 
-			var file = window.location.pathname;
-			var fileUrl = document.URL.replace(file, "/files" + file);
+			var file = window.location.pathname.substr(1);
+			var fileUrl = document.URL.replace(file, "/files/" + file);
 			var ending = file.substr(file.lastIndexOf(".") + 1);
 
-			if(typeof display[ending] == "function")
-				display[ending](fileUrl);
+			var mode = display.hasOwnProperty(ending) ? ending : "unknown";
+			if(typeof display[mode] == "function")
+				display[mode](fileUrl);
 			else
-				content.innerHTML = display[ending].toString().replace(/%url/g, fileUrl);
+				content.innerHTML = display[mode].replace(/%url/g, fileUrl).replace(/%file/g, file);
 		</script>
 	</body>
 </html>
