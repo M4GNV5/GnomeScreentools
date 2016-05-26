@@ -94,7 +94,18 @@ server.once("error", function(err)
 		});
 	}
 });
-server.once("listening", modes[job]);
+server.once("listening", function()
+{
+	try
+	{
+		modes[job]();
+	}
+	catch(e)
+	{
+		notify(e.toString(), false, "dialog-error");
+		process.exit(1);
+	}
+});
 server.listen(port);
 
 function shellCmd(cmd, fileext, cb)
