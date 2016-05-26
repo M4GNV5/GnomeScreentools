@@ -50,6 +50,7 @@
 
 			var display = {
 				"png": "<img src=\"%url\" />",
+				"jpg": "<img src=\"%url\" />",
 				"mp4": "<video src=\"%url\" controls autoplay></video>",
 				"txt": function(url)
 				{
@@ -89,6 +90,9 @@
 						{
 							var ext = file.substr(file.lastIndexOf(".") + 1);
 							var src = "<a href=\"/" + file + "\">" + file + "</a>";
+
+							if(ext == "jpg")
+								ext = "png";
 
 							if(knownExtensions.indexOf(ext) == -1)
 								sorted.misc.push(src);
