@@ -135,15 +135,15 @@
 				document.getElementsByTagName("head")[0].appendChild(file);
 			}
 
-			var file = window.location.pathname.substr(1);
-			var fileUrl = document.URL.replace(file, "/files/" + file);
+			var file = window.location.pathname;
+			var fileUrl = document.URL.replace(file, "/files" + file);
 			var ending = file.substr(file.lastIndexOf(".") + 1);
 
 			var mode = display.hasOwnProperty(ending) ? ending : "unknown";
 			if(typeof display[mode] == "function")
 				display[mode](fileUrl);
 			else
-				content.innerHTML = display[mode].replace(/%url/g, fileUrl).replace(/%file/g, file);
+				content.innerHTML = display[mode].replace(/%url/g, fileUrl).replace(/%file/g, file.substr(1));
 		</script>
 	</body>
 </html>
