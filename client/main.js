@@ -9,7 +9,13 @@ var job = process.argv[2] || config["default-job"] || "img-full";
 
 config.file = config["tmpfile"] || "screencapture";
 var modes = {
-	"img-full": shellCmd("gnome-screenshot -f {file}", "png"),
+	"img-full": shellCmd("gnome-screenshot -f {file}", "png", function(err)
+	{
+		if(err)
+			throw err;
+		var cmd = formatCmd("convert {file} -resize {img-full-resize} " + config.file);
+		exec(cmd, afterRecord);
+	}),
 	"img-region": shellCmd("gnome-screenshot -a -f {file}", "png"),
 	"clipboard": shellCmd("xclip -selection clipboard -o > {file}", "txt"),
 	"cli": function()
@@ -91,14 +97,14 @@ server.once("error", function(err)
 server.once("listening", modes[job]);
 server.listen(port);
 
-function shellCmd(cmd, fileext)
+function shellCmd(cmd, fileext, cb)
 {
 	return function()
 	{
 		config.file += "." + fileext;
 		cmd = formatCmd(cmd);
 
-		exec(cmd, afterRecord);
+		exec(cmd, cb || afterRecord);
 	};
 }
 
