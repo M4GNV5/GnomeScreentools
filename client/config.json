@@ -5,11 +5,6 @@
 	"vid-scale": "1920/2:-1",
 	"vid-fps": 30,
 	"upload-url": "http://127.0.0.1:8080/upload/hunter2",
-	
-	"stream-scale": "1920/2:-1",
-	"stream-fps": 30,
-	"stream-url": "http://127.0.0.1:8080/stream/960/540/hunter2",
-	"stream-public-url": "http://127.0.0.1:8080/stream",
-	
+
 	"busy-port": 3112
 }
