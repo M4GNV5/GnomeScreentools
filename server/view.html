@@ -26,6 +26,12 @@
 				text-align: center;
 			}
 
+			#fileInfo
+			{
+				color: white;
+				text-align: right;
+			}
+
 			#footer
 			{
 			    bottom: 2px;
@@ -50,7 +56,10 @@
 		</style>
 	</head>
 	<body background="files/background.png">
-		<div id="content" class="center"></div>
+		<div id="container" class="center">
+			<div id="content"></div>
+			<div id="fileInfo">%FILEINFO%</div>
+		</div>
 		<div id="footer"><a href="https://github.com/M4GNV5">Github</a> - <a href="https://twitter.com/M46NV5">Twitter</a></div>
 		<script type="text/javascript">
 			var content = document.getElementById("content");
@@ -91,7 +100,14 @@
 					var req = new XMLHttpRequest();
 					req.addEventListener("load", function()
 					{
-						var files = JSON.parse(this.responseText);
+						var fileData = JSON.parse(this.responseText);
+						var files = Object.keys(fileData);
+
+						files.sort(function(a, b)
+						{
+							return fileData[a].mtime - fileData[b].mtime;
+						});
+
 						var sorted = {misc: [], png: [], mp4: [], txt: []};
 						var knownExtensions = ["png", "mp4", "txt"];
 						files.forEach(function(file)

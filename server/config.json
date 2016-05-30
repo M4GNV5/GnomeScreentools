@@ -1,4 +1,5 @@
 {
 	"port": 8080,
-	"secret": "hunter2"
+	"secrets": {"hunter2": "Magnus"},
+	"keepFiles": [".gitkeep", "background.png"]
 }
