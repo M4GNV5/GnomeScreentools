@@ -124,6 +124,7 @@
 								sorted[ext].push(src);
 						});
 
+						document.getElementById("container").className = "";
 						content.className = "list";
 						content.innerHTML = "<b>Images:</b> " + sorted.png.join(", ") +
 							"<br /><b>Videos:</b> " + sorted.mp4.join(", ") +
