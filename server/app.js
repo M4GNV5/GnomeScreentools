@@ -104,7 +104,21 @@ app.use("/files", express.static(__dirname + "/../files"));
 app.get("/:file", function(req, res)
 {
 	var file = files[req.params.file];
-	var fileInfo = (new Date(file.mtime).toLocaleString()) + " by " + file.author;
+	var fileInfo = "";
+	if(file)
+	{
+		var timediff = (Date.now() - file.mtime) / 1000;
+		if(timediff < 60)
+			fileInfo = parseInt(timediff) + " seconds ago";
+		else if(timediff < 60 * 60)
+			fileInfo = parseInt(timediff / 60) + " minutes ago";
+		else if(timediff < 60 * 60 * 24)
+			fileInfo = parseInt(timediff / 60 / 60) + " hours ago";
+		else
+			fileInfo = parseInt(timediff / 60 / 60 / 24) + " days ago";
+		fileInfo += " by " + file.author;
+	}
+
 	res.send(viewFile.replace(/%FILEINFO%/g, fileInfo));
 });
 
