@@ -1,5 +1,4 @@
 var fs = require("fs");
-var WebSocketServer = require("ws").Server;
 var express = require("express");
 var busboy = require("connect-busboy");
 var config = require("./config.json");
