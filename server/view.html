@@ -76,7 +76,7 @@
 					function finish()
 					{
 						if(this && this.responseText)
-							text = this.responseText;
+							text = this.responseText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 						done++;
 						if(done != 3)
