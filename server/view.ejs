@@ -158,7 +158,7 @@ _%>
 			<div id="content" class="<%-contentClass%>"><%-content%></div>
 			<div id="fileInfo"><%=fileInfo%></div>
 		</div>
-		<%-file.author == "Magnus" ?
+		<%-typeof file == "object" && file.author == "Magnus" ?
 			'<div id="footer"><a href="https://github.com/M4GNV5">Github</a> - '+
 			'<a href="https://twitter.com/M46NV5">Twitter</a></div>' : ""%>
 	</body>
