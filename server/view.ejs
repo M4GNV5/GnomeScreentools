@@ -1,0 +1,165 @@
+<%_
+	var fileInfo = "";
+	if(typeof file == "object")
+	{
+		var timediff = (Date.now() - file.mtime) / 1000;
+		if(timediff < 60)
+			fileInfo = parseInt(timediff) + " seconds ago";
+		else if(timediff < 60 * 60)
+			fileInfo = parseInt(timediff / 60) + " minutes ago";
+		else if(timediff < 60 * 60 * 24)
+			fileInfo = parseInt(timediff / 60 / 60) + " hours ago";
+		else
+			fileInfo = parseInt(timediff / 60 / 60 / 24) + " days ago";
+		fileInfo += " by " + file.author;
+	}
+
+	var header;
+	var content;
+	var contentClass = "";
+	var containerClass = "center";
+	var display = {
+		"png": "<img src=\"%url\" />",
+		"jpg": "<img src=\"%url\" />",
+		"mp4": "<video src=\"%url\" controls autoplay></video>",
+		"unknown": "<div id=\"unknown\">Cannot display %file<br /><a href=\"%url\">Download file</a></div>",
+		"404": "<div id=\"unknown\">404<br />%file does not exist</div>",
+		"txt": function(file)
+		{
+			header = "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/railscasts.min.css\" />";
+			header += "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js\"></script>";
+			header += "<script>hljs.initHighlightingOnLoad();</script>"
+
+			var text = fs.readFileSync(filePath).toString();
+			text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+			contentClass = "txtContent";
+			content = "<pre><code>" + text + "</code></pre>";
+		},
+		"list": function()
+		{
+			var _files = [];
+			for(var key in files)
+			{
+				files[key].name = key;
+				_files.push(files[key]);
+			}
+			_files.sort(function(a, b)
+			{
+				return a.mtime - b.mtime;
+			});
+
+			var sorted = {misc: [], png: [], mp4: [], txt: []};
+			var knownExtensions = ["png", "mp4", "txt"];
+			_files.forEach(function(file)
+			{
+				var ext = file.name.substr(file.name.lastIndexOf(".") + 1);
+				var src = "<a href=\"/" + file.name + "\">" + file.name + "</a>";
+
+				if(ext == "jpg")
+					ext = "png";
+
+				if(knownExtensions.indexOf(ext) == -1)
+					sorted.misc.push(src);
+				else
+					sorted[ext].push(src);
+			});
+
+			containerClass = "";
+			contentClass = "list";
+			content = "<b>Images:</b> " + sorted.png.join(", ") +
+				"<br /><b>Videos:</b> " + sorted.mp4.join(", ") +
+				"<br /><b>Text:</b> " + sorted.txt.join(", ") +
+				"<br /><b>Misc:</b> " + sorted.misc.join(", ");
+		}
+	};
+
+	var fileUrl = url.replace(fileName, "files/" + fileName);
+	var ending = fileName.substr(fileName.lastIndexOf(".") + 1);
+
+	var mode = display.hasOwnProperty(ending) ? ending : "unknown";
+	if(!file)
+		mode = "404";
+
+	if(typeof display[mode] == "function")
+		display[mode](fileUrl);
+	else
+		content = display[mode].replace(/%url/g, fileUrl).replace(/%file/g, fileName);
+_%>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			.center
+			{
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+			.list
+			{
+				background-color: #EEEEEE;
+				padding: 10px;
+				max-width: 600px;
+
+				position: absolute;
+				left: 50%;
+				transform: translate(-50%);
+			}
+
+			#unknown
+			{
+				background-color: #EEEEEE;
+				padding: 10px;
+				text-align: center;
+			}
+
+			#txtContent
+			{
+				max-height: 95vh;
+				max-width: 95vw;
+			}
+
+			#fileInfo
+			{
+				color: white;
+				text-align: right;
+			}
+
+			#footer
+			{
+			    bottom: 2px;
+			    right: 5px;
+			    position: fixed;
+				color: white;
+			}
+			#footer a
+			{
+				text-decoration: none;
+				color: inherit;
+			}
+			pre
+			{
+				margin-top: 0px;
+				margin-bottom: 0px;
+			}
+			a, a:visited
+			{
+				color: #0000EE;
+			}
+		</style>
+
+		<% if(header) %>
+			<%- header %>
+	</head>
+	<body background="files/background.png">
+		<div id="container" class="<%-containerClass%>">
+			<div id="content" class="<%-contentClass%>"><%-content%></div>
+			<div id="fileInfo"><%=fileInfo%></div>
+		</div>
+		<%-file.author == "Magnus" ?
+			'<div id="footer"><a href="https://github.com/M4GNV5">Github</a> - '+
+			'<a href="https://twitter.com/M46NV5">Twitter</a></div>' : ""%>
+	</body>
+</html>

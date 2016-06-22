@@ -1,4 +1,5 @@
 var fs = require("fs");
+var ejs = require("ejs");
 var express = require("express");
 var busboy = require("connect-busboy");
 var config = require("./config.json");
@@ -98,32 +99,39 @@ app.post("/upload/:secret", function(req, res)
 	});
 });
 
-var viewFile = fs.readFileSync(__dirname + "/view.html").toString();
 app.use("/files", express.static(__dirname + "/../files"));
 app.get("/:file", function(req, res)
 {
-	var file = files[req.params.file];
-	var fileInfo = "";
-	if(file)
+	ejs.renderFile(__dirname + "/view.ejs", {
+		url: req.url,
+		fileName: req.params.file,
+		filePath: __dirname + "/../files/" + req.params.file,
+		file: files[req.params.file],
+		fs: fs,
+		files: files
+	}, {}, function(err, str)
 	{
-		var timediff = (Date.now() - file.mtime) / 1000;
-		if(timediff < 60)
-			fileInfo = parseInt(timediff) + " seconds ago";
-		else if(timediff < 60 * 60)
-			fileInfo = parseInt(timediff / 60) + " minutes ago";
-		else if(timediff < 60 * 60 * 24)
-			fileInfo = parseInt(timediff / 60 / 60) + " hours ago";
-		else
-			fileInfo = parseInt(timediff / 60 / 60 / 24) + " days ago";
-		fileInfo += " by " + file.author;
-	}
-
-	res.send(viewFile.replace(/%FILEINFO%/g, fileInfo));
+		if(err)
+			console.log(err);
+		res.send((err || str).toString());
+	});
 });
 
 app.get("/", function(req, res)
 {
-	res.send(viewFile.replace(/%FILEINFO%/g, ""));
+	ejs.renderFile(__dirname + "/view.ejs", {
+		url: req.url,
+		fileName: ".list",
+		filePath: undefined,
+		file: true,
+		fs: fs,
+		files: files
+	}, {}, function(err, str)
+	{
+		if(err)
+			console.log(err);
+		res.send((err || str).toString());
+	});
 });
 
 app.listen(config.port, function()
