@@ -12,6 +12,7 @@
 		else
 			fileInfo = parseInt(timediff / 60 / 60 / 24) + " days ago";
 		fileInfo += " by " + file.author;
+		fileInfo = "<a href=\"javascript:setTags()\">" + fileInfo + "</a>";
 	}
 
 	var header;
@@ -52,6 +53,9 @@
 			var knownExtensions = ["png", "mp4", "txt"];
 			_files.forEach(function(file)
 			{
+				if(tagSearch && file.tags.indexOf(tagSearch) < 0 && file.author.indexOf(tagSearch) < 0)
+					return;
+
 				var ext = file.name.substr(file.name.lastIndexOf(".") + 1);
 				var src = "<a href=\"/" + file.name + "\">" + file.name + "</a>";
 
@@ -66,7 +70,11 @@
 
 			containerClass = "";
 			contentClass = "list";
-			content = "<b>Images:</b> " + sorted.png.join(", ") +
+			content = "<b>Search:</b> <form method=\"GET\">" +
+					"<input type=\"text\" name=\"q\" value=\"" + (tagSearch || "") + "\" />" +
+					"<input type=\"submit\" value=\"submit\" />" +
+				"</form>" +
+				"<br /><b>Images:</b> " + sorted.png.join(", ") +
 				"<br /><b>Videos:</b> " + sorted.mp4.join(", ") +
 				"<br /><b>Text:</b> " + sorted.txt.join(", ") +
 				"<br /><b>Misc:</b> " + sorted.misc.join(", ");
@@ -126,6 +134,11 @@ _%>
 				color: white;
 				text-align: right;
 			}
+			#fileInfo a
+			{
+				text-decoration: none;
+				color: inherit;
+			}
 
 			#footer
 			{
@@ -156,10 +169,23 @@ _%>
 	<body background="files/background.png">
 		<div id="container" class="<%-containerClass%>">
 			<div id="content" class="<%-contentClass%>"><%-content%></div>
-			<div id="fileInfo"><%=fileInfo%></div>
+			<div id="fileInfo"><%-fileInfo%></div>
 		</div>
 		<%-typeof file == "object" && file.author == "Magnus" ?
 			'<div id="footer"><a href="https://github.com/M4GNV5">Github</a> - '+
 			'<a href="https://twitter.com/M46NV5">Twitter</a></div>' : ""%>
+
+		<script type="text/javascript">
+			function setTags()
+			{
+				var tags = prompt("Enter Tags", <%-JSON.stringify((file || {}).tags || "")%>);
+				if(tags)
+				{
+					var req = new XMLHttpRequest();
+					req.open("GET", "/tag/" + escape(tags) + "/<%-fileName%>", true);
+					req.send();
+				}
+			}
+		</script>
 	</body>
 </html>

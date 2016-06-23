@@ -4,28 +4,12 @@ var express = require("express");
 var busboy = require("connect-busboy");
 var config = require("./config.json");
 var files = require("./data.json");
+var dataHasChanges = true;
 
 var app = express();
 app.use(busboy());
 
 var basePath = __dirname + "/../files/";
-
-function deleteOldFiles()
-{
-	var delTime = Date.now() - 7 * 24 * 60 * 60 * 1000;
-	for(var key in files)
-	{
-		if(config.keepFiles.indexOf(key) !== -1)
-			continue;
-
-		if(files[key].mtime < delTime)
-		{
-			console.log("Deleting old file " + key);
-			fs.unlink(basePath + key);
-			delete files[key];
-		}
-	}
-}
 
 fs.readdir(basePath, function(err, foundFiles)
 {
@@ -36,12 +20,19 @@ fs.readdir(basePath, function(err, foundFiles)
 	files = {};
 	for(var i = 0; i < foundFiles.length; i++)
 	{
-		files[foundFiles[i]] = _files[foundFiles[i]] || {author: "system"};
+		files[foundFiles[i]] = _files[foundFiles[i]] || {author: "system", tags: ""};
 		files[foundFiles[i]].mtime = fs.statSync(basePath + foundFiles[i]).mtime.getTime();
 	}
 
-	deleteOldFiles();
-	setInterval(deleteOldFiles, 60 * 60 * 1000);
+	function updateData()
+	{
+		if(dataHasChanges)
+			fs.writeFile(__dirname + "/data.json", JSON.stringify(files));
+		dataHasChanges = false;
+	}
+
+	updateData();
+	setInterval(updateData, 60 * 60 * 1000);
 });
 
 fs.watch(basePath, function(ev, file)
@@ -63,11 +54,7 @@ fs.watch(basePath, function(ev, file)
 		files[file].author = "system";
 
 	files[file].mtime = mtime;
-});
-
-app.get("/list", function(req, res)
-{
-	res.send(JSON.stringify(files));
+	dataHasChanges = true;
 });
 
 app.post("/upload/:secret", function(req, res)
@@ -94,9 +81,19 @@ app.post("/upload/:secret", function(req, res)
 
 			var user = config.secrets[secret];
 			files[outname] = {mtime: Date.now(), author: user};
-			fs.writeFile("./data.json", JSON.stringify(files, null, 4));
+			dataHasChanges = true;
 		});
 	});
+});
+
+app.get("/tag/:tags/:file", function(req, res)
+{
+	if(files.hasOwnProperty(req.params.file))
+	{
+		files[req.params.file].tags = req.params.tags;
+		dataHasChanges = true;
+	}
+	res.redirect("/" + req.params.file);
 });
 
 app.use("/files", express.static(__dirname + "/../files"));
@@ -108,7 +105,8 @@ app.get("/:file", function(req, res)
 		filePath: __dirname + "/../files/" + req.params.file,
 		file: files[req.params.file],
 		fs: fs,
-		files: files
+		files: files,
+		tagSearch: req.query.q
 	}, {}, function(err, str)
 	{
 		if(err)
@@ -125,7 +123,8 @@ app.get("/", function(req, res)
 		filePath: undefined,
 		file: true,
 		fs: fs,
-		files: files
+		files: files,
+		tagSearch: req.query.q
 	}, {}, function(err, str)
 	{
 		if(err)
