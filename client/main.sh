@@ -2,7 +2,6 @@
 
 file="$HOME/screencapture"
 declare -A config=(
-	["default-mode"]="img_full"
 	["screen-size"]="1920x1080"
 
 	["img-full-resize"]="50%"
@@ -58,6 +57,6 @@ fi
 cliFile=$2
 $1
 url=$(curl -F "file=@$file" ${config["upload-url"]})
-echo "$url" | xclip -selection clipboard
+echo -n "$url" | xclip -selection clipboard
 notify-send -i camera-web "$url"
 rm $file
