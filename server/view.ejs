@@ -53,7 +53,7 @@
 			var knownExtensions = ["png", "mp4", "txt"];
 			_files.forEach(function(file)
 			{
-				if(tagSearch && file.tags.indexOf(tagSearch) < 0 && file.author.indexOf(tagSearch) < 0)
+				if(tagSearch && (!file.tags || file.tags.indexOf(tagSearch) < 0) && file.author.indexOf(tagSearch) < 0)
 					return;
 
 				var ext = file.name.substr(file.name.lastIndexOf(".") + 1);
