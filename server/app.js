@@ -4,7 +4,6 @@ var express = require("express");
 var busboy = require("connect-busboy");
 var config = require("./config.json");
 var files = require("./data.json");
-var dataHasChanges = true;
 
 var app = express();
 app.use(busboy());
@@ -23,16 +22,6 @@ fs.readdir(basePath, function(err, foundFiles)
 		files[foundFiles[i]] = _files[foundFiles[i]] || {author: "system", tags: ""};
 		files[foundFiles[i]].mtime = fs.statSync(basePath + foundFiles[i]).mtime.getTime();
 	}
-
-	function updateData()
-	{
-		if(dataHasChanges)
-			fs.writeFile(__dirname + "/data.json", JSON.stringify(files));
-		dataHasChanges = false;
-	}
-
-	updateData();
-	setInterval(updateData, 60 * 60 * 1000);
 });
 
 fs.watch(basePath, function(ev, file)
@@ -54,7 +43,7 @@ fs.watch(basePath, function(ev, file)
 		files[file].author = "system";
 
 	files[file].mtime = mtime;
-	dataHasChanges = true;
+	fs.writeFile(__dirname + "/data.json", JSON.stringify(files));
 });
 
 app.post("/upload/:secret", function(req, res)
@@ -81,7 +70,7 @@ app.post("/upload/:secret", function(req, res)
 
 			var user = config.secrets[secret];
 			files[outname] = {mtime: Date.now(), author: user};
-			dataHasChanges = true;
+			fs.writeFile(__dirname + "/data.json", JSON.stringify(files));
 		});
 	});
 });
@@ -91,7 +80,7 @@ app.get("/tag/:tags/:file", function(req, res)
 	if(files.hasOwnProperty(req.params.file))
 	{
 		files[req.params.file].tags = req.params.tags;
-		dataHasChanges = true;
+		fs.writeFile(__dirname + "/data.json", JSON.stringify(files));
 	}
 	res.redirect("/" + req.params.file);
 });
