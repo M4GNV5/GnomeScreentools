@@ -34,6 +34,7 @@
 
 			var text = fs.readFileSync(filePath).toString();
 			text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+			fileInfo = "";
 			contentClass = "txtContent";
 			content = "<pre><code>" + text + "</code></pre>";
 		},
@@ -117,17 +118,17 @@ _%>
 				transform: translate(-50%);
 			}
 
+			.txtContent
+			{
+				max-height: 95vh;
+				max-width: 95vw;
+			}
+
 			#unknown
 			{
 				background-color: #EEEEEE;
 				padding: 10px;
 				text-align: center;
-			}
-
-			#txtContent
-			{
-				max-height: 95vh;
-				max-width: 95vw;
 			}
 
 			#fileInfo
