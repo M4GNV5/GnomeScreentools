@@ -8,7 +8,7 @@ declare -A config=(
 
 	["vid-scale"]="1920/2:-1"
 	["vid-fps"]="30"
-	["upload-url"]="http://127.0.0.1:8080/upload/hunter2"
+	["upload-url"]="http://127.0.0.1:8080/cupload/hunter2"
 
 	["busy-port"]=3112
 )
@@ -62,7 +62,10 @@ if [ ! -e "$file" ]; then
 fi
 
 notify-send -i camera-web "Uploading..."
+gzip $file
+mv "$file.gz" "$file"
 url=$(curl -F "file=@$file" ${config["upload-url"]})
+
 echo -n "$url" | xclip -selection clipboard
 notify-send -i camera-web "$url"
 rm $file

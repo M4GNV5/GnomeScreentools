@@ -1,4 +1,5 @@
 var fs = require("fs");
+var zlib = require("zlib");
 var ejs = require("ejs");
 var express = require("express");
 var busboy = require("connect-busboy");
@@ -59,10 +60,42 @@ app.post("/upload/:secret", function(req, res)
 	req.busboy.on("file", function (name, file, filename)
 	{
 		var outname = Math.random().toString(36).substr(2, 6) + filename.substr(filename.lastIndexOf("."));
-		console.log((new Date()).toLocaleString() + " Uploading: " + outname);
+		console.log((new Date()).toLocaleString() + " Uploading (uncompressed): " + outname);
 
 		var stream = fs.createWriteStream(__dirname + "/../files/" + outname);
 		file.pipe(stream);
+
+		stream.on("close", function ()
+		{
+			res.end("You are uploading uncompressed!\n" +
+				"Please consider uploading a gzip'ed file to /cupload/:secret instead.\n" +
+				"http://" + req.get("host") + "/" + outname);
+
+			var user = config.secrets[secret];
+			files[outname] = {mtime: Date.now(), author: user};
+			fs.writeFile(__dirname + "/data.json", JSON.stringify(files));
+		});
+	});
+});
+
+app.post("/cupload/:secret", function(req, res)
+{
+	var secret = req.params.secret;
+	if(!config.secrets.hasOwnProperty(secret))
+	{
+		res.end("invalid secret");
+		return;
+	}
+
+	req.pipe(req.busboy);
+	req.busboy.on("file", function (name, file, filename)
+	{
+		var outname = Math.random().toString(36).substr(2, 6) + filename.substr(filename.lastIndexOf("."));
+		console.log((new Date()).toLocaleString() + " Uploading: " + outname);
+
+		var stream = fs.createWriteStream(__dirname + "/../files/" + outname);
+		var gzip = zlib.createGunzip();
+		file.pipe(gzip).pipe(stream);
 
 		stream.on("close", function ()
 		{
