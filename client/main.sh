@@ -51,11 +51,17 @@ function vid-full
 
 echo "" | nc -q 1 localhost ${config["busy-port"]}
 if [ $? -eq 0 ]; then
-    exit 0
+	exit 0
 fi
 
 cliFile=$2
 $1
+
+if [ ! -e "$file" ]; then
+	exit 1
+fi
+
+notify-send -i camera-web "Uploading..."
 url=$(curl -F "file=@$file" ${config["upload-url"]})
 echo -n "$url" | xclip -selection clipboard
 notify-send -i camera-web "$url"
