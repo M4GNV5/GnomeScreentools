@@ -19,7 +19,7 @@ fs.readdir(basePath, function(err, foundFiles)
 	files = {};
 	for(var i = 0; i < foundFiles.length; i++)
 	{
-		files[foundFiles[i]] = _files[foundFiles[i]] || {author: "system", tags: ""};
+		files[foundFiles[i]] = _files[foundFiles[i]] || {author: "system"};
 		files[foundFiles[i]].mtime = fs.statSync(basePath + foundFiles[i]).mtime.getTime();
 	}
 });
@@ -73,16 +73,6 @@ app.post("/upload/:secret", function(req, res)
 			fs.writeFile(__dirname + "/data.json", JSON.stringify(files));
 		});
 	});
-});
-
-app.get("/tag/:tags/:file", function(req, res)
-{
-	if(files.hasOwnProperty(req.params.file))
-	{
-		files[req.params.file].tags = req.params.tags;
-		fs.writeFile(__dirname + "/data.json", JSON.stringify(files));
-	}
-	res.redirect("/" + req.params.file);
 });
 
 app.use("/files", express.static(__dirname + "/../files"));
