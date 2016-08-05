@@ -61,7 +61,6 @@ if [ ! -e "$file" ]; then
 	exit 1
 fi
 
-notify-send -i camera-web "Uploading..."
 gzip $file
 mv "$file.gz" "$file"
 url=$(curl -F "file=@$file" ${config["upload-url"]})
