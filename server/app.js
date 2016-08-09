@@ -1,4 +1,5 @@
 var fs = require("fs");
+var path = require("path");
 var zlib = require("zlib");
 var ejs = require("ejs");
 var express = require("express");
@@ -111,20 +112,28 @@ app.post("/cupload/:secret", function(req, res)
 app.use("/files", express.static(__dirname + "/../files"));
 app.get("/:file", function(req, res)
 {
-	ejs.renderFile(__dirname + "/view.ejs", {
-		url: req.url,
-		fileName: req.params.file,
-		filePath: __dirname + "/../files/" + req.params.file,
-		file: files[req.params.file],
-		fs: fs,
-		files: files,
-		tagSearch: req.query.q
-	}, {}, function(err, str)
+	var accept = req.get("Accept");
+	if(accept && /text\/html/.test(accept))
 	{
-		if(err)
-			console.log(err);
-		res.send((err || str).toString());
-	});
+		ejs.renderFile(__dirname + "/view.ejs", {
+			url: req.url,
+			fileName: req.params.file,
+			filePath: __dirname + "/../files/" + req.params.file,
+			file: files[req.params.file],
+			fs: fs,
+			files: files,
+			tagSearch: req.query.q
+		}, {}, function(err, str)
+		{
+			if(err)
+				console.error(err);
+			res.send((err || str).toString());
+		});
+	}
+	else
+	{
+		res.sendFile(path.resolve(__dirname + "/../files/" + req.params.file));
+	}
 });
 
 app.get("/", function(req, res)
