@@ -51,8 +51,12 @@
 				return a.mtime - b.mtime;
 			});
 
-			var sorted = {misc: [], png: [], mp4: [], txt: []};
-			var knownExtensions = ["png", "mp4", "txt"];
+			var sorted = {misc: [], image: [], video: [], text: []};
+			var knownExtensions = {
+				"image": ["png", "jpg"],
+				"video": ["mp4", "webm"],
+				"text": ["txt"]
+			};
 			_files.forEach(function(file)
 			{
 				if(tagSearch && file.author.indexOf(tagSearch) < 0 && file.mtime.toString().indexOf(tagSearch) < 0)
@@ -61,13 +65,17 @@
 				var ext = file.name.substr(file.name.lastIndexOf(".") + 1);
 				var src = "<a href=\"/" + file.name + "\">" + file.name + "</a>";
 
-				if(ext == "jpg")
-					ext = "png";
-
-				if(knownExtensions.indexOf(ext) == -1)
+				var known = false;
+				for(var key in knownExtensions)
+				{
+					if(knownExtensions[key].indexOf(ext) != -1)
+					{
+						known = true;
+						sorted[key].push(src);
+					}
+				}
+				if(!known)
 					sorted.misc.push(src);
-				else
-					sorted[ext].push(src);
 			});
 
 			containerClass = "";
@@ -76,9 +84,9 @@
 					"<input type=\"text\" name=\"q\" value=\"" + (tagSearch || "") + "\" />" +
 					"<input type=\"submit\" value=\"submit\" />" +
 				"</form>" +
-				"<br /><b>Images:</b> " + sorted.png.join(", ") +
-				"<br /><b>Videos:</b> " + sorted.mp4.join(", ") +
-				"<br /><b>Text:</b> " + sorted.txt.join(", ") +
+				"<br /><b>Images:</b> " + sorted.image.join(", ") +
+				"<br /><b>Videos:</b> " + sorted.video.join(", ") +
+				"<br /><b>Text:</b> " + sorted.text.join(", ") +
 				"<br /><b>Misc:</b> " + sorted.misc.join(", ");
 		}
 	};
