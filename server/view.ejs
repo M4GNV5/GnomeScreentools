@@ -38,6 +38,17 @@
 			contentClass = "txtContent";
 			content = "<pre><code>" + text + "</code></pre>";
 		},
+		"upload": function()
+		{
+			containerClass = "";
+			contentClass = "list";
+			content = "<h3>File upload</h3>" +
+					"<form action=\"/upload\" method=\"post\" enctype=\"multipart/form-data\">" +
+						"Secret: <input type=\"password\" onchange=\"this.parentElement.action='/upload/' + this.value;\" /><br />" +
+						"File: <input type=\"file\" name=\"file\" /><br />" +
+						"<input type=\"submit\" value=\" Upload \" />"
+					"</form>";
+		},
 		"list": function()
 		{
 			var _files = [];

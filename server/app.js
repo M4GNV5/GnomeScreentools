@@ -109,6 +109,24 @@ app.post("/cupload/:secret", function(req, res)
 	});
 });
 
+app.get("/upload", function(req, res)
+{
+	ejs.renderFile(__dirname + "/view.ejs", {
+		url: req.url,
+		fileName: ".upload",
+		filePath: undefined,
+		file: true,
+		fs: fs,
+		files: files,
+		tagSearch: req.query.q
+	}, {}, function(err, str)
+	{
+		if(err)
+			console.log(err);
+		res.send((err || str).toString());
+	});
+});
+
 app.use("/files", express.static(__dirname + "/../files"));
 app.get("/:file", function(req, res)
 {
