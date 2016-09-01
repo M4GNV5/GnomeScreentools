@@ -8,6 +8,8 @@ declare -A config=(
 
 	["vid-scale"]="1920/2:-1"
 	["vid-fps"]="30"
+	["microphone"]="alsa_input.usb-046d_081d_33A51F90-00-U0x46d0x81d.analog-mono"
+
 	["upload-url"]="http://127.0.0.1:8080/cupload/hunter2"
 
 	["busy-port"]=3112
@@ -41,8 +43,20 @@ function cli
 function vid-full
 {
 	file+=".mp4"
-	avconv -video_size ${config["screen-size"]} -framerate ${config["vid-fps"]} \
+	ffmpeg -video_size ${config["screen-size"]} -framerate ${config["vid-fps"]} \
 		-f x11grab -i :0.0 -vf scale=${config["vid-scale"]} "$file" &
+	local avconvPid=$!
+	nc -lp ${config["busy-port"]}
+	kill -SIGINT $avconvPid
+	wait $avconvPid
+}
+
+function vid-full-audio
+{
+	file+=".mp4"
+	ffmpeg -f pulse -ac 1 -i "${config["microphone"]}" \
+		-f x11grab -r ${config["vid-fps"]} -s ${config["screen-size"]} -i :0.0+0,0 \
+		-acodec aac -vcodec libx264 -vf scale=${config["vid-scale"]} "$file" &
 	local avconvPid=$!
 	nc -lp ${config["busy-port"]}
 	kill -SIGINT $avconvPid
