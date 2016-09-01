@@ -68,9 +68,7 @@ app.post("/upload/:secret", function(req, res)
 
 		stream.on("close", function ()
 		{
-			res.end("You are uploading uncompressed!\n" +
-				"Please consider uploading a gzip'ed file to /cupload/:secret instead.\n" +
-				"http://" + req.get("host") + "/" + outname);
+			res.end("http://" + req.get("host") + "/" + outname);
 
 			var user = config.secrets[secret];
 			files[outname] = {mtime: Date.now(), author: user};
