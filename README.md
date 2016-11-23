@@ -4,7 +4,7 @@ script + server for capturing, uploading and displaying videos, images and text
 ##Install
 ```bash
 #install required packages
-apt-get install libnotify-bin gnome-screenshot libav-tools imagemagick xclip
+apt-get install libnotify-bin gnome-screenshot ffmpeg imagemagick xclip
 
 git clone https://github.com/M4GNV5/GnomeScreentools.git
 cd GnomeScreentools
