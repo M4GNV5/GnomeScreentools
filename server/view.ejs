@@ -30,7 +30,11 @@
 		{
 			header = "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/styles/railscasts.min.css\" />";
 			header += "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js\"></script>";
-			header += "<script>hljs.initHighlightingOnLoad();</script>"
+			header += "<script>"+
+						"if(location.hash)"+
+							"hljs.configure({languages: location.hash.substr(1).split(\",\")});"+
+						"hljs.initHighlightingOnLoad();"+
+					"</script>";
 
 			var text = fs.readFileSync(filePath).toString();
 			text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -126,6 +130,7 @@ _%>
 				left: 50%;
 				transform: translate(-50%, -50%);
 			}
+
 			.list
 			{
 				background-color: #EEEEEE;
@@ -137,23 +142,35 @@ _%>
 				transform: translate(-50%);
 			}
 
+			#unknown
+			{
+				background-color: #EEEEEE;
+				padding: 10px;
+				text-align: center;
+			}
+
 			.txtContent
 			{
 				max-height: 95vh;
 				max-width: 95vw;
 			}
-			
+			pre
+			{
+				margin-top: 0px;
+				margin-bottom: 0px;
+				tab-size: 4;
+			}
+
 			#container
 			{
 				max-width: 99%;
 				max-height: 99%;
 			}
 
-			#unknown
+			#content img
 			{
-				background-color: #EEEEEE;
-				padding: 10px;
-				text-align: center;
+				max-height: 95vh;
+				max-width: 95vw;
 			}
 
 			#fileInfo
@@ -179,11 +196,7 @@ _%>
 				text-decoration: none;
 				color: inherit;
 			}
-			pre
-			{
-				margin-top: 0px;
-				margin-bottom: 0px;
-			}
+
 			a, a:visited
 			{
 				color: #0000EE;
@@ -195,7 +208,9 @@ _%>
 	</head>
 	<body background="files/background.png">
 		<div id="container" class="<%-containerClass%>">
-			<div id="content" class="<%-contentClass%>"><%-content%></div>
+			<div id="content"<%-contentClass ? " class=\"" + contentClass + "\"" : ""%>>
+				<%-content%>
+			</div>
 			<div id="fileInfo"><%-fileInfo%></div>
 		</div>
 		<%-typeof file == "object" && file.author == "Magnus" ?
