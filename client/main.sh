@@ -2,13 +2,14 @@
 
 file="$HOME/screencapture"
 declare -A config=(
-	["screen-size"]="1920x1080"
+	["screen-size"]="3840x2160"
 
-	["img-full-resize"]="50%"
+	#["img-full-resize"]="50%"
 
-	["vid-scale"]="1920/2:-1"
+	["vid-scale"]="3840/2:-1"
 	["vid-fps"]="30"
-	["microphone"]="alsa_input.usb-046d_081d_33A51F90-00-U0x46d0x81d.analog-mono"
+	#alsa_input.usb-NA_Wireless_Audio-00.analog-mono
+	["microphone"]="alsa_output.usb-NA_Wireless_Audio-00.iec958-stereo.monitor"
 
 	["upload-url"]="http://127.0.0.1:8080/cupload/hunter2"
 
@@ -19,7 +20,7 @@ function img-full
 {
 	file+=".png"
 	gnome-screenshot -f $file
-	convert $file -resize ${config["img-full-resize"]} $file
+	#convert $file -resize ${config["img-full-resize"]} $file
 }
 
 function img-region
@@ -44,7 +45,7 @@ function vid-full
 {
 	file+=".mp4"
 	ffmpeg -video_size ${config["screen-size"]} -framerate ${config["vid-fps"]} \
-		-f x11grab -i :0.0 -vf scale=${config["vid-scale"]} "$file" &
+		-f x11grab -i :1.0 -vf scale=${config["vid-scale"]} "$file" &
 	local avconvPid=$!
 	nc -lp ${config["busy-port"]}
 	kill -SIGINT $avconvPid
@@ -55,7 +56,7 @@ function vid-full-audio
 {
 	file+=".mp4"
 	ffmpeg -f pulse -ac 1 -i "${config["microphone"]}" \
-		-f x11grab -r ${config["vid-fps"]} -s ${config["screen-size"]} -i :0.0+0,0 \
+		-f x11grab -r ${config["vid-fps"]} -s ${config["screen-size"]} -i :1.0+0,0 \
 		-acodec aac -vcodec libx264 -vf scale=${config["vid-scale"]} "$file" &
 	local avconvPid=$!
 	nc -lp ${config["busy-port"]}
