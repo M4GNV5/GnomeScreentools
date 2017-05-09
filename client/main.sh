@@ -11,7 +11,7 @@ declare -A config=(
 	#alsa_input.usb-NA_Wireless_Audio-00.analog-mono
 	["microphone"]="alsa_output.usb-NA_Wireless_Audio-00.iec958-stereo.monitor"
 
-	["upload-url"]="http://127.0.0.1:8080/cupload/hunter2"
+	["upload-url"]="http://127.0.0.1:8080/upload/hunter2"
 
 	["busy-port"]=3112
 )
@@ -76,8 +76,6 @@ if [ ! -e "$file" ]; then
 	exit 1
 fi
 
-gzip $file
-mv "$file.gz" "$file"
 url=$(curl -F "file=@$file" ${config["upload-url"]})
 
 echo -n "$url" | xclip -selection clipboard
