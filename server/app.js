@@ -125,6 +125,45 @@ app.get("/upload", function(req, res)
 	});
 });
 
+app.post("/delete", function(req, res)
+{
+	res.end("hi" + require("util").inspect(req));
+});
+app.get("/delete", function(req, res)
+{
+	var secret = req.query.secret;
+	var file = req.query.file;
+	if(files.hasOwnProperty(file) && files[file].author == config.secrets[secret])
+	{
+		fs.unlink(__dirname + "/../files/" + file, function(err)
+		{
+			if(err)
+				console.log(err);
+
+			delete files[file];
+			res.end("file deleted");
+		});
+	}
+	else
+	{
+		ejs.renderFile(__dirname + "/view.ejs", {
+			url: req.url,
+			fileName: ".delete",
+			filePath: undefined,
+			file: true,
+			fs: fs,
+			files: files,
+			tagSearch: req.query.q
+		}, {}, function(err, str)
+		{
+			if(err)
+				console.log(err);
+
+			res.send((err || str).toString());
+		});
+	}
+});
+
 app.use("/files", express.static(__dirname + "/../files"));
 app.get("/:file", function(req, res)
 {

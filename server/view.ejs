@@ -53,6 +53,17 @@
 						"<input type=\"submit\" value=\" Upload \" />"
 					"</form>";
 		},
+		"delete": function()
+		{
+			containerClass = "";
+			contentClass = "list";
+			content = "<h3>File delete</h3>" +
+					"<form action=\"/delete\" method=\"get\">" +
+						"Secret: <input type=\"password\" name=\"secret\" /><br />" +
+						"File: <input type=\"text\" name=\"file\" /><br />" +
+						"<input type=\"submit\" value=\" Delete \" />"
+					"</form>";
+		},
 		"list": function()
 		{
 			var _files = [];
