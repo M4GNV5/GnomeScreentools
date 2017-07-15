@@ -52,7 +52,7 @@ function vid-full
 	wait $ffmpegPid
 }
 
-function vid-region
+function vid-window
 {
 	out=$(xwininfo)
 	#echo "$out"
