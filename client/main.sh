@@ -20,7 +20,6 @@ function img-full
 {
 	file+=".png"
 	gnome-screenshot -f $file
-	#convert $file -resize ${config["img-full-resize"]} $file
 }
 
 function img-region
@@ -55,7 +54,6 @@ function vid-full
 function vid-window
 {
 	out=$(xwininfo)
-	#echo "$out"
 
 	startX=$(echo $out | grep -Po "Absolute upper-left X:\s*(\d+)" | cut -d: -f2 | tr -d '[:space:]')
 	startY=$(echo $out | grep -Po "Absolute upper-left Y:\s*(\d+)" | cut -d: -f2 | tr -d '[:space:]')
