@@ -1,6 +1,7 @@
 #!/bin/bash
 
 file="$HOME/screencapture"
+basedir=$(dirname "$0")
 declare -A config=(
 	["screen-size"]="3840x2160"
 
@@ -19,13 +20,14 @@ declare -A config=(
 function img-full
 {
 	file+=".png"
-	gnome-screenshot -f $file
+	scrot $file
 }
 
 function img-region
 {
 	file+=".png"
-	gnome-screenshot -a -f "$file"
+	scrot $file
+	python "$basedir/select.py" $file $file
 }
 
 function clipboard
