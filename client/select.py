@@ -1,5 +1,5 @@
 #CONFIGURE HERE
-RESIZE_TO = (1280, 720)
+RESIZE_TO = (1920, 1080)
 RECT_COLOR = (0, 0, 255) #blue, green, red
 RECT_THICKNESS = 1
 
@@ -63,6 +63,9 @@ minX = min(x1, x2)
 maxX = max(x1, x2)
 minY = min(y1, y2)
 maxY = max(y1, y2)
-result = orginal[minY : maxY, minX : maxX]
 
+if maxX - minX < 10 and maxY - minY < 10:
+	exit(1)
+
+result = orginal[minY : maxY, minX : maxX]
 cv2.imwrite(sys.argv[2], result)

@@ -27,7 +27,7 @@ function img-region
 {
 	file+=".png"
 	scrot $file
-	python "$basedir/select.py" $file $file
+	python "$basedir/select.py" $file $file || rm $file
 }
 
 function clipboard
