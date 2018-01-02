@@ -9,10 +9,12 @@ declare -A config=(
 
 	["vid-scale"]="3840/2:-1"
 	["vid-fps"]="30"
-	#alsa_input.usb-NA_Wireless_Audio-00.analog-mono
-	["microphone"]="alsa_output.usb-NA_Wireless_Audio-00.iec958-stereo.monitor"
 
-	["upload-url"]="http://127.0.0.1:8080/upload/hunter2"
+	#put your microphone here
+	["microphone"]=""
+
+	["upload-to"]="$basedir/../files/"
+	["copy-url"]="localhost/"
 
 	["busy-port"]=3112
 )
@@ -105,7 +107,9 @@ if [ ! -e "$file" ]; then
 	exit 1
 fi
 
-url=$(curl -F "file=@$file" ${config["upload-url"]})
+target="$(date +"%Y-%m-%d_%R").${file##*.}"
+scp "$file" "${config["upload-to"]}$target"
+url="${config["copy-url"]}$target"
 
 echo -n "$url" | xclip -selection clipboard
 notify-send -i camera-web "$url"
