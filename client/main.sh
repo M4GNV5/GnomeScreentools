@@ -27,9 +27,18 @@ function img-full
 
 function img-region
 {
+	local tmpfile="${file}_tmp.png"
 	file+=".png"
-	scrot $file
-	python "$basedir/select.py" $file $file || rm $file
+
+	scrot $tmpfile
+
+	eog -f $tmpfile &
+	local eogPid=$!
+
+	gnome-screenshot -a -f $file
+	kill -TERM $eogPid
+
+	rm $tmpfile
 }
 
 function clipboard
