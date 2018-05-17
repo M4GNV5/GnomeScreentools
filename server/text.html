@@ -41,7 +41,7 @@
 			var code = document.getElementById("code");
 			if (this.readyState == 4 && this.status == 200)
 			{
-				code.innerHTML = xhttp.responseText;
+				code.innerHTML = xhttp.responseText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 				if(location.hash)
 					hljs.configure({languages: location.hash.substr(1).split(",")});
@@ -51,8 +51,9 @@
 				hljs.highlightBlock(code);
 			}
 		};
-		xhttp.open("GET", "/txt/" + (document.location.search.substr(1)), true);
+		xhttp.open("GET", "/raw/" + (document.location.search.substr(1)), true);
 		xhttp.send();
 		</script>
 	</body>
 </html>
+
