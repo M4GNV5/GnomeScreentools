@@ -13,8 +13,9 @@ declare -A config=(
 	#put your microphone here
 	["microphone"]=""
 
-	["upload-to"]="$basedir/../files/"
-	["copy-url"]="localhost/"
+	["remote-host"]="netcup"
+	["remote-path"]="/var/www/images/"
+	["copy-url"]="https://i.m4gnus.de/"
 
 	["busy-port"]=3112
 )
@@ -113,13 +114,25 @@ cliFile=$2
 $1
 
 if [ ! -e "$file" ]; then
+	notify-send "Error creating screenshot!"
 	exit 1
 fi
 
-target="$(date +"%Y-%m-%d_%R").${file##*.}"
-scp "$file" "${config["upload-to"]}$target"
-url="${config["copy-url"]}$target"
+target="$(date +"%Y-%m/%Y-%m-%dT%R").${file##*.}"
+remotePath="${config["remote-host"]}:${config["remote-path"]}"
+scp "$file" "$remotePath$target"
+if [ $? -ne 0 ]; then
+	ssh "${config["remote-host"]}" "mkdir -p ${config["remote-path"]}/$(date +"%Y-%m")"
+	scp "$file" "$remotePath$target"
+fi
 
+if [ $? -ne 0 ]; then
+	notify-send "Error uploading screenshot!"
+	exit 1
+fi
+
+url="${config["copy-url"]}$target"
 echo -n "$url" | xclip -selection clipboard
+
 notify-send -i camera-web "$url"
 rm $file
