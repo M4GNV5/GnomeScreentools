@@ -119,6 +119,7 @@ if [ ! -e "$file" ]; then
 fi
 
 target="$(date +"%Y-%m/%Y-%m-%dT%R").${file##*.}"
+short=$(printf "%x\n" $(($(date "+%s") / 60 - 25418760)))
 remotePath="${config["remote-host"]}:${config["remote-path"]}"
 scp "$file" "$remotePath$target"
 if [ $? -ne 0 ]; then
@@ -131,7 +132,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-url="${config["copy-url"]}$target"
+url="${config["copy-url"]}$short.${file##*.}"
 echo -n "$url" | xclip -selection clipboard
 
 notify-send -i camera-web "$url"
