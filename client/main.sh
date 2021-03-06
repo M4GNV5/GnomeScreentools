@@ -3,18 +3,18 @@
 file="$HOME/screencapture"
 basedir=$(dirname "$0")
 declare -A config=(
-	["screen-size"]="3840x2160"
+	["screen-size"]="1920x1080"
 
 	#["img-full-resize"]="50%"
 
-	["vid-scale"]="3840/2:-1"
+	["vid-scale"]="1920/2:-1"
 	["vid-fps"]="30"
 
 	#put your microphone here
 	["microphone"]=""
 
-	["remote-host"]="netcup"
-	["remote-path"]="/var/www/images/"
+	["remote-host"]="jakob"
+	["remote-path"]="/var/www/i.m4gnus.de/"
 	["copy-url"]="https://i.m4gnus.de/"
 
 	["busy-port"]=3112
@@ -23,23 +23,33 @@ declare -A config=(
 function img-full
 {
 	file+=".png"
-	scrot $file
+	scrot "$file"
 }
 
-function img-region
+function img-region-old
 {
 	local tmpfile="${file}_tmp.png"
 	file+=".png"
 
-	scrot $tmpfile
+	scrot "$tmpfile"
 
-	eog -f $tmpfile &
+	eog -f "$tmpfile" &
 	local eogPid=$!
 
-	gnome-screenshot -a -f $file
+	gnome-screenshot -a -f "$file"
 	kill -TERM $eogPid
 
-	rm $tmpfile
+	rm "$tmpfile"
+}
+
+function img-region
+{
+	file+=".png"
+	flameshot gui -p /tmp -r > "$file"
+
+	if [ $? -ne 0 ]; then
+		rm "$file"
+	fi
 }
 
 function clipboard
@@ -51,14 +61,14 @@ function clipboard
 function cli
 {
 	file+=".${cliFile##*.}"
-	cp $cliFile $file
+	cp "$cliFile" "$file"
 }
 
 function vid-full
 {
 	file+=".mp4"
 	ffmpeg -video_size ${config["screen-size"]} -framerate ${config["vid-fps"]} \
-		-f x11grab -i :1.0 -vf scale=${config["vid-scale"]} "$file" &
+		-f x11grab -i :0.0 -vf scale=${config["vid-scale"]} "$file" &
 	local ffmpegPid=$!
 	nc -lp ${config["busy-port"]}
 	kill -SIGINT $ffmpegPid
