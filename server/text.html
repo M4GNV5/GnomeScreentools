@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<meta charset="UTF-8">
 		<style>
 			body
 			{
@@ -24,7 +25,7 @@
 			}
 		</style>
 
-		<link rel="stylesheet" href="highlightjs/solarized-dark.css">
+		<link rel="stylesheet" href="highlightjs/solarized-dark.min.css">
 	</head>
 	<body>
 		<pre>
@@ -33,7 +34,7 @@
 			</code>
 		</pre>
 
-		<script src="highlightjs/highlight.pack.js"></script>
+		<script src="highlightjs/highlight.min.js"></script>
 		<script>
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function()
@@ -45,13 +46,11 @@
 
 				if(location.hash)
 					hljs.configure({languages: location.hash.substr(1).split(",")});
-				else
-					hljs.configure({languages: ["C"]}); //hljs is broken, see isagalaev/highlight.js #1387
 
 				hljs.highlightBlock(code);
 			}
 		};
-		xhttp.open("GET", "/raw/" + (document.location.search.substr(1)), true);
+		xhttp.open("GET", document.location.search.substr(1), true);
 		xhttp.send();
 		</script>
 	</body>
